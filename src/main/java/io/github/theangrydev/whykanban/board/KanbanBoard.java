@@ -3,29 +3,37 @@ package io.github.theangrydev.whykanban.board;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
 public class KanbanBoard {
-	private List<ReadyToPlayStory> storiesReadyToPlay;
-	private List<InAnalysisStory> storiesInAnalysis;
-	private List<InDevelopmentStory> storiesInDevelopment;
-	private List<WaitingForTestStory> storiesWaitingForTest;
-	private List<InTestingStory> storiesInTesting;
-	private List<CompletedStory> storiesCompleted;
+	private WorkLane<ReadyToPlayStory> storiesReadyToPlay;
+	private WorkLane<InAnalysisStory> storiesInAnalysis;
+	private WorkLane<InDevelopmentStory> storiesInDevelopment;
+	private WorkLane<WaitingForTestStory> storiesWaitingForTest;
+	private WorkLane<InTestingStory> storiesInTesting;
+	private WorkLane<CompletedStory> storiesCompleted;
 
 	private KanbanBoard() {
-		storiesReadyToPlay = new ArrayList<>();
-		storiesInAnalysis = new ArrayList<>();
-		storiesInDevelopment = new ArrayList<>();
-		storiesWaitingForTest = new ArrayList<>();
-		storiesInTesting = new ArrayList<>();
-		storiesCompleted = new ArrayList<>();
+		storiesReadyToPlay = new WorkLane<>();
+		storiesInAnalysis = new WorkLane<>();
+		storiesInDevelopment = new WorkLane<>();
+		storiesWaitingForTest = new WorkLane<>();
+		storiesInTesting = new WorkLane<>();
+		storiesCompleted = new WorkLane<>();
 	}
 
 	public static KanbanBoard emptyBoard() {
 		return new KanbanBoard();
+	}
+
+	public KanbanBoard withWorkInProgressLimit(int workInProgressLimit) {
+		storiesReadyToPlay.setWorkInProgressLimit(workInProgressLimit);
+		storiesInAnalysis.setWorkInProgressLimit(workInProgressLimit);
+		storiesInDevelopment.setWorkInProgressLimit(workInProgressLimit);
+		storiesWaitingForTest.setWorkInProgressLimit(workInProgressLimit);
+		storiesInTesting.setWorkInProgressLimit(workInProgressLimit);
+		return this;
 	}
 
 	public List<ReadyToPlayStory> storiesReadyToPlay() {
@@ -53,7 +61,9 @@ public class KanbanBoard {
 	}
 
 	public void addReadyToPlayStory(Story story) {
-		storiesReadyToPlay.add(ReadyToPlayStory.readyToPlayStory(story));
+		if (!storiesReadyToPlay.workInProgressLimitHasBeenReached()) {
+			storiesReadyToPlay.add(ReadyToPlayStory.readyToPlayStory(story));
+		}
 	}
 
 	public void moveToAnalysis(ReadyToPlayStory readyToPlayStory) {
@@ -80,9 +90,11 @@ public class KanbanBoard {
 		storiesCompleted.clear();
 	}
 
-	private <FromStory extends StoryInLane, ToStory> void moveToColumn(FromStory story, List<FromStory> fromStories, List<ToStory> toStories, Function<Story, ToStory> transition) {
+	private <FromStory extends StoryInLane, ToStory> void moveToColumn(FromStory story, WorkLane<FromStory> fromStories, WorkLane<ToStory> toStories, Function<Story, ToStory> transition) {
 		Preconditions.checkState(fromStories.contains(story), "%s story '%s' is not in the column!", story.getClass().getSimpleName(), story);
-		fromStories.remove(story);
-		toStories.add(transition.apply(story.story()));
+		if (!toStories.workInProgressLimitHasBeenReached()) {
+			fromStories.remove(story);
+			toStories.add(transition.apply(story.story()));
+		}
 	}
 }

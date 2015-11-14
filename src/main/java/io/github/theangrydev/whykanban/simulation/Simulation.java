@@ -32,6 +32,7 @@ public class Simulation {
 		kanbanBoard.storiesCompleted().stream().map(CompletedStory::story).forEach(story -> story.markComplete(currentDay));
 		leadTimeDistribution.recordDay(currentDay, kanbanBoard);
 		throughputRecorder.recordDay(currentDay, kanbanBoard);
+		kanbanBoard.removeCompletedStories();
 		currentDay = currentDay.nextDay();
 	}
 

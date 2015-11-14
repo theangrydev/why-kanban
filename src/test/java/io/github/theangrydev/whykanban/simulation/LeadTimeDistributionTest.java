@@ -18,7 +18,8 @@ public class LeadTimeDistributionTest implements WithAssertions, WithKanbanBoard
 	public void averageLeadTimeIsTheAverageOfTheLeadTimesOfAllTheCompletedStories() {
 		LeadTimeDistribution leadTimeDistribution = LeadTimeDistribution.leadTimeDistribution();
 
-		leadTimeDistribution.recordDay(anyDay(), boardWithCompletedStories(storyWithLeadTime(5), storyWithLeadTime(7)));
+		leadTimeDistribution.recordDay(anyDay(), boardWithCompletedStories(storyWithLeadTime(5)));
+		leadTimeDistribution.recordDay(anyDay(), boardWithCompletedStories(storyWithLeadTime(7)));
 
 		assertThat(leadTimeDistribution.averageLeadTime()).isEqualTo((5 + 7) / 2);
 	}

@@ -16,22 +16,12 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 
 	@Table({
 		@Row({"1", "0"}),
-		@Row({"2", "1"}),
-		@Row({"3", "1.67"}),
-		@Row({"4", "2.5"}),
-		@Row({"10", "7"}),
-		@Row({"11", "7.73"}),
-		@Row({"12", "8.5"}),
-		@Row({"13", "9.23"}),
-		@Row({"14", "10"}),
-		@Row({"15", "10.73"}),
-		@Row({"16", "11.5"}),
-		@Row({"17", "12.24"}),
-		@Row({"18", "13"}),
-		@Row({"19", "13.74"})
+		@Row({"10", "2.5"}),
+		@Row({"100", "25"}),
+		@Row({"1000", "250"}),
 	})
 	@Test
-	public void averageLeadTimeIncreasesWhenTheTeamWorksSlowerThanTheBacklogRate(String numberOfDays, String averageLeadTime) {
+	public void averageLeadTimeIncreasesWhenThTeamWorksSlowerThanTheBacklogRate(String numberOfDays, String averageLeadTime) {
 		Simulation simulation = Simulation.simulation(Backlog.backlog(2), KanbanBoard.emptyBoard(), teamWithOneOfEachSpecialist());
 
 		simulation.advanceDays(Integer.valueOf(numberOfDays));
@@ -40,16 +30,26 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 	}
 
 	@Table({
+		@Row({"1"}),
+		@Row({"10"}),
+		@Row({"100"}),
+		@Row({"1000"}),
+	})
+	@Test
+	public void averageLeadTimeIsBoundedWhenAWorkInProgressLimitIsUsedAndStoriesArePlayedInTheOrderTheyArrive(String numberOfDays) {
+		double leadTimeUpperBound = 1;
+		Simulation simulation = Simulation.simulation(Backlog.backlog(2), KanbanBoard.emptyBoard().withWorkInProgressLimit(2), teamWithOneOfEachSpecialist());
+
+		simulation.advanceDays(Integer.valueOf(numberOfDays));
+
+		assertThat(simulation.averageLeadTime()).isLessThan(leadTimeUpperBound);
+	}
+
+	@Table({
 		@Row({"1", "1"}),
-		@Row({"2", "1"}),
-		@Row({"3", "1"}),
-		@Row({"4", "1"}),
-		@Row({"5", "1"}),
-		@Row({"6", "1"}),
-		@Row({"7", "1"}),
-		@Row({"8", "1"}),
-		@Row({"9", "1"}),
 		@Row({"10", "1"}),
+		@Row({"100", "1"}),
+		@Row({"1000", "1"}),
 	})
 	@Test
 	public void throughputRemainsConstantWhenTheTeamWorksSlowerThanTheBacklogRate(String numberOfDays, String averageLeadTime) {
