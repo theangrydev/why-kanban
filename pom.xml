@@ -49,6 +49,7 @@
 		<yatspec.version>1.14</yatspec.version>
 		<junit.version>4.12</junit.version>
 		<guava.version>18.0</guava.version>
+		<apache.commons.math.version>3.5</apache.commons.math.version>
 	</properties>
 
 	<build>
@@ -186,6 +187,13 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
+		</dependency>
+
+		<!-- Apache Commons Math -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>${apache.commons.math.version}</version>
 		</dependency>
 
 		<!-- Test dependencies -->

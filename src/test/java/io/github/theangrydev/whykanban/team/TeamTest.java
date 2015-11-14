@@ -10,7 +10,7 @@ public class TeamTest implements WithAssertions, WithKanbanBoardExamples, WithTe
 	@Test
 	public void teamCanWorkOnAStoryFromReadyToPlayToCompleted() {
 		KanbanBoard kanbanBoard = boardWithOneReadyToPlayStory();
-		Team team = teamOfSpecialists();
+		Team team = teamWithOneOfEachSpecialist();
 
 		team.doWork(kanbanBoard);
 

@@ -1,12 +1,11 @@
 package io.github.theangrydev.whykanban.board;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
-import static java.util.Collections.unmodifiableList;
 
 public class KanbanBoard {
 	private List<ReadyToPlayStory> storiesReadyToPlay;
@@ -30,27 +29,27 @@ public class KanbanBoard {
 	}
 
 	public List<ReadyToPlayStory> storiesReadyToPlay() {
-		return unmodifiableList(storiesReadyToPlay);
+		return Lists.newArrayList(storiesReadyToPlay);
 	}
 
 	public List<InAnalysisStory> storiesInAnalysis() {
-		return unmodifiableList(storiesInAnalysis);
+		return Lists.newArrayList(storiesInAnalysis);
 	}
 
 	public List<InDevelopmentStory> storiesInDevelopment() {
-		return unmodifiableList(storiesInDevelopment);
+		return Lists.newArrayList(storiesInDevelopment);
 	}
 
 	public List<WaitingForTestStory> storiesWaitingForTest() {
-		return unmodifiableList(storiesWaitingForTest);
+		return Lists.newArrayList(storiesWaitingForTest);
 	}
 
 	public List<CompletedStory> storiesCompleted() {
-		return unmodifiableList(storiesCompleted);
+		return Lists.newArrayList(storiesCompleted);
 	}
 
 	public List<InTestingStory> storiesInTesting() {
-		return unmodifiableList(storiesInTesting);
+		return Lists.newArrayList(storiesInTesting);
 	}
 
 	public void addReadyToPlayStory(Story story) {
@@ -75,6 +74,10 @@ public class KanbanBoard {
 
 	public void moveToCompleted(InTestingStory inTestingStory) {
 		moveToColumn(inTestingStory, storiesInTesting, storiesCompleted, CompletedStory::completedStory);
+	}
+
+	public void removeCompletedStories() {
+		storiesCompleted.clear();
 	}
 
 	private <FromStory extends StoryInLane, ToStory> void moveToColumn(FromStory story, List<FromStory> fromStories, List<ToStory> toStories, Function<Story, ToStory> transition) {

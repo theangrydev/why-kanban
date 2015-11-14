@@ -82,4 +82,13 @@ public class KanbanBoardTest implements WithAssertions, WithKanbanBoardExamples 
 		assertThat(kanbanBoard.storiesInTesting()).isEmpty();
 		assertThat(kanbanBoard.storiesCompleted()).hasSize(1);
 	}
+
+	@Test
+	public void completedStoriesCanBeRemoved() {
+		KanbanBoard kanbanBoard = boardWithOneCompletedStory();
+
+		kanbanBoard.removeCompletedStories();
+
+		assertThat(kanbanBoard.storiesCompleted()).isEmpty();
+	}
 }
