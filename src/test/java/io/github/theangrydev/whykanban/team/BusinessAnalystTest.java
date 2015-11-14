@@ -8,12 +8,13 @@ import org.junit.Test;
 public class BusinessAnalystTest implements WithAssertions, WithKanbanBoardExamples {
 
 	@Test
-	public void worksOnStoriesInAnalysis() {
-		KanbanBoard kanbanBoard = boardWithOneInAnalysisStory();
+	public void worksOnStoriesInReadyToPlayAndInAnalysis() {
+		KanbanBoard kanbanBoard = boardWithOneReadyToPlayStory();
 		BusinessAnalyst businessAnalyst = BusinessAnalyst.businessAnalyst();
 
 		businessAnalyst.doWork(kanbanBoard);
 
+		assertThat(kanbanBoard.storiesReadyToPlay()).isEmpty();
 		assertThat(kanbanBoard.storiesInAnalysis()).isEmpty();
 		assertThat(kanbanBoard.storiesInDevelopment()).hasSize(1);
 	}
