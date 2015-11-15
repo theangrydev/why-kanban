@@ -58,4 +58,21 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 
 		assertThat(simulation.storiesCompletedPerDay()).isEqualTo(Double.valueOf(averageLeadTime));
 	}
+
+	@Table({
+		@Row({"1"}),
+		@Row({"10"}),
+		@Row({"100"}),
+		@Row({"1000"}),
+	})
+	@Test
+	public void throughputIsDecreasedWhenWorkInProgressLimitsAreSetTooLow(String numberOfDays) {
+		Simulation simulationWithTooSmallWorkInProgress = Simulation.simulation(Backlog.backlog(20), KanbanBoard.emptyBoard().withWorkInProgressLimit(1), teamWithTwoOfEachSpecialist());
+		Simulation simulationWithLargeEnoughWorkInProgress = Simulation.simulation(Backlog.backlog(20), KanbanBoard.emptyBoard().withWorkInProgressLimit(2), teamWithTwoOfEachSpecialist());
+
+		simulationWithTooSmallWorkInProgress.advanceDays(Integer.valueOf(numberOfDays));
+		simulationWithLargeEnoughWorkInProgress.advanceDays(Integer.valueOf(numberOfDays));
+
+		assertThat(simulationWithTooSmallWorkInProgress.storiesCompletedPerDay()).isLessThan(simulationWithLargeEnoughWorkInProgress.storiesCompletedPerDay());
+	}
 }
