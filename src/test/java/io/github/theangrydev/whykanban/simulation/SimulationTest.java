@@ -30,19 +30,18 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 	}
 
 	@Table({
-		@Row({"1"}),
-		@Row({"10"}),
-		@Row({"100"}),
-		@Row({"1000"}),
+		@Row({"1", "1"}),
+		@Row({"10", "1"}),
+		@Row({"100", "1"}),
+		@Row({"1000", "1"}),
 	})
 	@Test
-	public void averageLeadTimeIsBoundedWhenAWorkInProgressLimitIsUsedAndStoriesArePlayedInTheOrderTheyArrive(String numberOfDays) {
-		double leadTimeUpperBound = 1;
+	public void averageLeadTimeIsBoundedWhenAWorkInProgressLimitIsUsedAndUniformStoriesArePlayedInTheOrderTheyArrive(String numberOfDays, String leadTimeUpperBound) {
 		Simulation simulation = Simulation.simulation(Backlog.backlog(2), KanbanBoard.emptyBoard().withWorkInProgressLimit(2), teamWithOneOfEachSpecialist());
 
 		simulation.advanceDays(Integer.valueOf(numberOfDays));
 
-		assertThat(simulation.averageLeadTime()).isLessThan(leadTimeUpperBound);
+		assertThat(simulation.averageLeadTime()).isLessThan(Double.valueOf(leadTimeUpperBound));
 	}
 
 	@Table({
@@ -57,6 +56,6 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 
 		simulation.advanceDays(Integer.valueOf(numberOfDays));
 
-		assertThat(simulation.storiesCompletedPerDay()).isCloseTo(Double.valueOf(averageLeadTime), withPercentage(1));
+		assertThat(simulation.storiesCompletedPerDay()).isEqualTo(Double.valueOf(averageLeadTime));
 	}
 }
