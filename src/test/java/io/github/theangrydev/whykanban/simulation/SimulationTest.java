@@ -21,7 +21,7 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 		@Row({"1000", "250"}),
 	})
 	@Test
-	public void averageLeadTimeIncreasesWhenThTeamWorksSlowerThanTheBacklogRate(String numberOfDays, String averageLeadTime) {
+	public void averageLeadTimeIncreasesWhenTheTeamWorksSlowerThanTheBacklogRate(String numberOfDays, String averageLeadTime) {
 		Simulation simulation = Simulation.simulation(Backlog.backlog(2), KanbanBoard.emptyBoard(), teamWithOneOfEachSpecialist());
 
 		simulation.advanceDays(Integer.valueOf(numberOfDays));
