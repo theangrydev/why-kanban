@@ -19,7 +19,7 @@ public class WorkLane<StoryType> extends ArrayList<StoryType> {
 	}
 
 	public boolean workInProgressLimitHasBeenReached() {
-		return workInProgressLimit == size();
+		return workInProgressLimit >= size();
 	}
 
 	@Override
