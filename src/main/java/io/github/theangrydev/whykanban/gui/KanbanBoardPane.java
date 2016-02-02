@@ -10,7 +10,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import org.reactfx.util.FxTimer;
 
 import java.time.Duration;
 import java.util.ArrayDeque;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static java.util.Collections.nCopies;
+import static org.reactfx.util.FxTimer.runPeriodically;
 
 public class KanbanBoardPane extends GridPane {
 
@@ -30,16 +30,20 @@ public class KanbanBoardPane extends GridPane {
     private static final int WAITING_FOR_TEST_COLUMN = 3;
     private static final int TESTING_COLUMN = 4;
     private static final int COMPLETED_COLUMN = 5;
+    private static final int STORIES_ROW = 1;
+    private static final int HEADER_ROW = 0;
 
     private Deque<KanbanBoardState> pendingSnapshots = new ArrayDeque<>();
 
+    private KanbanBoardPane(KanbanBoard kanbanBoard) {
+        getColumnConstraints().addAll(columnConstraints());
+        kanbanBoard.boardChanges().subscribe(this::remember);
+        runPeriodically(UPDATE_INTERVAL, this::pollSnapshot);
+        update(kanbanBoard);
+    }
+
     public static KanbanBoardPane kanbanBoardPane(KanbanBoard kanbanBoard) {
-        KanbanBoardPane kanbanBoardPane = new KanbanBoardPane();
-        kanbanBoardPane.getColumnConstraints().addAll(columnConstraints());
-        kanbanBoard.boardChanges().subscribe(kanbanBoardPane::remember);
-        FxTimer.runPeriodically(UPDATE_INTERVAL, kanbanBoardPane::pollSnapshot);
-        kanbanBoardPane.update(kanbanBoard);
-        return kanbanBoardPane;
+        return new KanbanBoardPane(kanbanBoard);
     }
 
     public static List<ColumnConstraints> columnConstraints() {
@@ -82,7 +86,7 @@ public class KanbanBoardPane extends GridPane {
             Story story = storyInLane.story();
             bucket.getChildren().add(story(String.format("#%d", story.storyNumber())));
         }
-        add(bucket, column, 1);
+        add(bucket, column, STORIES_ROW);
     }
 
     private void addHeaders() {
@@ -95,7 +99,7 @@ public class KanbanBoardPane extends GridPane {
     }
 
     private void addHeader(String name, int readyColumn) {
-        add(swimLaneHeader(name), readyColumn, 0);
+        add(swimLaneHeader(name), readyColumn, HEADER_ROW);
     }
 
     private static Text swimLaneHeader(String name) {

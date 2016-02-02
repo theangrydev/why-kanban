@@ -21,6 +21,10 @@ public class Team {
 		teamMembers.add(teamMember);
 	}
 
+	public void removeTeamMembersOfType(Class<? extends TeamMember> typeToRemove) {
+		teamMembers.removeIf(typeToRemove::isInstance);
+	}
+
 	public void doWork(KanbanBoard kanbanBoard) {
 		teamMembers.forEach(teamMember -> teamMember.doWork(kanbanBoard));
 	}

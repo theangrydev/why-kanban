@@ -21,4 +21,21 @@ public class TeamTest implements WithAssertions, WithKanbanBoardExamples, WithTe
 		assertThat(kanbanBoard.storiesInTesting()).isEmpty();
 		assertThat(kanbanBoard.storiesCompleted()).hasSize(1);
 	}
+
+	@Test
+	public void removingTestersMeansThatStoriesCannotBeTested() {
+		KanbanBoard kanbanBoard = boardWithOneReadyToPlayStory();
+		Team team = teamWithOneOfEachSpecialist();
+
+		team.removeTeamMembersOfType(Tester.class);
+
+		team.doWork(kanbanBoard);
+
+		assertThat(kanbanBoard.storiesReadyToPlay()).isEmpty();
+		assertThat(kanbanBoard.storiesInAnalysis()).isEmpty();
+		assertThat(kanbanBoard.storiesInDevelopment()).isEmpty();
+		assertThat(kanbanBoard.storiesWaitingForTest()).hasSize(1);
+		assertThat(kanbanBoard.storiesInTesting()).isEmpty();
+		assertThat(kanbanBoard.storiesCompleted()).isEmpty();
+	}
 }

@@ -3,28 +3,34 @@ package io.github.theangrydev.whykanban.gui;
 import io.github.theangrydev.whykanban.board.KanbanBoard;
 import io.github.theangrydev.whykanban.simulation.Backlog;
 import io.github.theangrydev.whykanban.simulation.Simulation;
-import io.github.theangrydev.whykanban.team.Team;
+import io.github.theangrydev.whykanban.team.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.reactfx.EventSource;
 
+import java.util.function.Supplier;
+
 import static io.github.theangrydev.whykanban.gui.KanbanBoardPane.kanbanBoardPane;
 import static io.github.theangrydev.whykanban.gui.MouseEvents.leftClicks;
 import static io.github.theangrydev.whykanban.gui.StatisticTicker.statisticWithLabel;
+import static io.github.theangrydev.whykanban.gui.SettingSpinner.settingSpinner;
 import static io.github.theangrydev.whykanban.team.BusinessAnalyst.businessAnalyst;
 import static io.github.theangrydev.whykanban.team.Developer.developer;
 import static io.github.theangrydev.whykanban.team.Tester.tester;
 
 public class KanbanApplication extends Application {
 
-    private final KanbanBoard kanbanBoard = KanbanBoard.emptyBoard();
-    private final Simulation simulation = Simulation.simulation(Backlog.backlog(2), kanbanBoard, teamWithOneOfEachSpecialist());
+    private KanbanBoard kanbanBoard = KanbanBoard.emptyBoard().withWorkInProgressLimit(2);
+    private Team team = teamWithOneOfEachSpecialist();
+    private Backlog backlog = Backlog.backlog(2);
+    private Simulation simulation = Simulation.simulation(backlog, kanbanBoard, team);
 
     private Team teamWithOneOfEachSpecialist() {
         Team team = Team.team();
@@ -45,7 +51,7 @@ public class KanbanApplication extends Application {
         root.setPadding(new Insets(10));
         root.setRight(statisticsColumn());
         root.setCenter(kanbanBoardPane(kanbanBoard));
-        root.setBottom(advanceDayButton());
+        root.setBottom(controls());
 
         Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
         Scene scene = new Scene(root, visualBounds.getWidth() / 2, visualBounds.getHeight() / 2);
@@ -53,6 +59,56 @@ public class KanbanApplication extends Application {
         primaryStage.setTitle("Why Kanban?");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public FlowPane controls() {
+        FlowPane controls = new FlowPane();
+
+        SettingSpinner replenishmentRate = settingSpinner("Replenishment Rate", 2);
+        replenishmentRate.setting().subscribe(this::modifyReplenishmentRate);
+
+        SettingSpinner workInProgressLimit = settingSpinner("WIP Limit", 99);
+        workInProgressLimit.setting().subscribe(this::modifyWorkInProgressLimit);
+
+        SettingSpinner analysts = settingSpinner("Analysts", 1);
+        analysts.setting().subscribe(this::modifyAnalystCount);
+
+        SettingSpinner developers = settingSpinner("Developers", 1);
+        developers.setting().subscribe(this::modifyDeveloperCount);
+
+        SettingSpinner testers = settingSpinner("Testers", 1);
+        testers.setting().subscribe(this::modifyTesterCount);
+
+        controls.getChildren().addAll(advanceDayButton(), replenishmentRate, workInProgressLimit, analysts, developers, testers);
+
+        return controls;
+    }
+
+    private void modifyReplenishmentRate(int replenishmentRate) {
+        backlog.withReplenishmentRate(replenishmentRate);
+    }
+
+    private void modifyWorkInProgressLimit(int workInProgressLimit) {
+        kanbanBoard.withWorkInProgressLimit(workInProgressLimit);
+    }
+
+    private void modifyAnalystCount(int analystCount) {
+        modifyTeamMemberCount(analystCount, BusinessAnalyst.class, BusinessAnalyst::businessAnalyst);
+    }
+
+    private void modifyDeveloperCount(int developerCount) {
+        modifyTeamMemberCount(developerCount, Developer.class, Developer::developer);
+    }
+
+    private void modifyTesterCount(int testerCount) {
+        modifyTeamMemberCount(testerCount, Tester.class, Tester::tester);
+    }
+
+    private <T extends TeamMember> void modifyTeamMemberCount(int memberCount, Class<T> type, Supplier<T> memberFactory) {
+        team.removeTeamMembersOfType(type);
+        for (int i = 0; i < memberCount; i++) {
+            team.addTeamMember(memberFactory.get());
+        }
     }
 
     private Column statisticsColumn() {

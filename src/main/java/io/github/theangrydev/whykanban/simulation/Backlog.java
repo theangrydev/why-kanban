@@ -19,6 +19,10 @@ public class Backlog {
 		return new Backlog(replenishmentRate);
 	}
 
+	public void withReplenishmentRate(int replenishmentRate) {
+		this.replenishmentRate = replenishmentRate;
+	}
+
 	public List<Story> stories() {
 		return IntStream.range(0, replenishmentRate).mapToObj(operand -> Story.aStory(storyNumber++)).collect(Collectors.toList());
 	}
