@@ -29,7 +29,7 @@ public class KanbanApplication extends Application {
 
     private KanbanBoard kanbanBoard = KanbanBoard.emptyBoard().withWorkInProgressLimit(2);
     private Team team = teamWithOneOfEachSpecialist();
-    private Backlog backlog = Backlog.backlog(2);
+    private Backlog backlog = Backlog.backlog(1);
     private Simulation simulation = Simulation.simulation(backlog, kanbanBoard, team);
 
     private Team teamWithOneOfEachSpecialist() {
