@@ -34,12 +34,31 @@ public class KanbanBoardPane extends GridPane {
     private static final int HEADER_ROW = 0;
 
     private Deque<KanbanBoardState> pendingSnapshots = new ArrayDeque<>();
+    private FlowPane readyColumn;
+    private FlowPane analysisColumn;
+    private FlowPane developmentColumn;
+    private FlowPane waitingForTestColumn;
+    private FlowPane testingColumn;
+    private FlowPane completedColumn;
 
     private KanbanBoardPane(KanbanBoard kanbanBoard) {
         getColumnConstraints().addAll(columnConstraints());
+        addHeaders();
+        addBuckets();
+
         kanbanBoard.boardChanges().filter(this::notSameAsLast).subscribe(this::remember);
         runPeriodically(UPDATE_INTERVAL, this::pollSnapshot);
+
         update(kanbanBoard);
+    }
+
+    private void addBuckets() {
+        readyColumn = addBucket(READY_COLUMN);
+        analysisColumn = addBucket(ANALYSIS_COLUMN);
+        developmentColumn = addBucket(DEVELOPMENT_COLUMN);
+        waitingForTestColumn = addBucket(WAITING_FOR_TEST_COLUMN);
+        testingColumn = addBucket(TESTING_COLUMN);
+        completedColumn = addBucket(COMPLETED_COLUMN);
     }
 
     private boolean notSameAsLast(KanbanBoardState kanbanBoardState) {
@@ -67,30 +86,33 @@ public class KanbanBoardPane extends GridPane {
     }
 
     private void update(KanbanBoardState current) {
-        getChildren().clear();
-        addHeaders();
         addStories(current);
         requestParentLayout();
     }
 
     private void addStories(KanbanBoardState current) {
-        addStories(current, KanbanBoardState::storiesReadyToPlay, READY_COLUMN);
-        addStories(current, KanbanBoardState::storiesInAnalysis, ANALYSIS_COLUMN);
-        addStories(current, KanbanBoardState::storiesInDevelopment, DEVELOPMENT_COLUMN);
-        addStories(current, KanbanBoardState::storiesWaitingForTest, WAITING_FOR_TEST_COLUMN);
-        addStories(current, KanbanBoardState::storiesInTesting, TESTING_COLUMN);
-        addStories(current, KanbanBoardState::storiesCompleted, COMPLETED_COLUMN);
+        addStories(current, KanbanBoardState::storiesReadyToPlay, readyColumn);
+        addStories(current, KanbanBoardState::storiesInAnalysis, analysisColumn);
+        addStories(current, KanbanBoardState::storiesInDevelopment, developmentColumn);
+        addStories(current, KanbanBoardState::storiesWaitingForTest, waitingForTestColumn);
+        addStories(current, KanbanBoardState::storiesInTesting, testingColumn);
+        addStories(current, KanbanBoardState::storiesCompleted, completedColumn);
     }
 
-    private void addStories(KanbanBoardState current, Function<KanbanBoardState, List<? extends StoryInLane>> storiesOfType, int column) {
-        FlowPane bucket = new FlowPane();
-        bucket.setHgap(2);
+    private void addStories(KanbanBoardState current, Function<KanbanBoardState, List<? extends StoryInLane>> storiesOfType, FlowPane column) {
+        column.getChildren().clear();
         List<? extends StoryInLane> stories = storiesOfType.apply(current);
         for (StoryInLane storyInLane : stories) {
             Story story = storyInLane.story();
-            bucket.getChildren().add(story(String.format("#%d", story.storyNumber())));
+            column.getChildren().add(story(String.format("#%d", story.storyNumber())));
         }
+    }
+
+    private FlowPane addBucket(int column) {
+        FlowPane bucket = new FlowPane();
+        bucket.setHgap(2);
         add(bucket, column, STORIES_ROW);
+        return bucket;
     }
 
     private void addHeaders() {
