@@ -22,7 +22,7 @@ import static org.reactfx.util.FxTimer.runPeriodically;
 
 public class KanbanBoardPane extends GridPane {
 
-    private static final Duration UPDATE_INTERVAL = Duration.ofMillis(100);
+    private static final Duration UPDATE_INTERVAL = Duration.ofMillis(50);
     private static final int TOTAL_COLUMNS = 6;
     private static final int READY_COLUMN = 0;
     private static final int ANALYSIS_COLUMN = 1;
@@ -37,9 +37,13 @@ public class KanbanBoardPane extends GridPane {
 
     private KanbanBoardPane(KanbanBoard kanbanBoard) {
         getColumnConstraints().addAll(columnConstraints());
-        kanbanBoard.boardChanges().subscribe(this::remember);
+        kanbanBoard.boardChanges().filter(this::notSameAsLast).subscribe(this::remember);
         runPeriodically(UPDATE_INTERVAL, this::pollSnapshot);
         update(kanbanBoard);
+    }
+
+    private boolean notSameAsLast(KanbanBoardState kanbanBoardState) {
+        return pendingSnapshots.isEmpty() || !pendingSnapshots.peek().equals(kanbanBoardState);
     }
 
     public static KanbanBoardPane kanbanBoardPane(KanbanBoard kanbanBoard) {

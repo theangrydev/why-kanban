@@ -1,6 +1,7 @@
 package io.github.theangrydev.whykanban.board;
 
 import java.util.List;
+import java.util.Objects;
 
 public class KanbanBoardSnapshot implements KanbanBoardState {
 
@@ -52,5 +53,27 @@ public class KanbanBoardSnapshot implements KanbanBoardState {
     @Override
     public List<InTestingStory> storiesInTesting() {
         return storiesInTesting;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(storiesReadyToPlay, storiesInAnalysis, storiesInDevelopment, storiesWaitingForTest, storiesCompleted, storiesInTesting);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final KanbanBoardSnapshot other = (KanbanBoardSnapshot) obj;
+        return Objects.equals(this.storiesReadyToPlay, other.storiesReadyToPlay)
+            && Objects.equals(this.storiesInAnalysis, other.storiesInAnalysis)
+            && Objects.equals(this.storiesInDevelopment, other.storiesInDevelopment)
+            && Objects.equals(this.storiesWaitingForTest, other.storiesWaitingForTest)
+            && Objects.equals(this.storiesCompleted, other.storiesCompleted)
+            && Objects.equals(this.storiesInTesting, other.storiesInTesting);
     }
 }
