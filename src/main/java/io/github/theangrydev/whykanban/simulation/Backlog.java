@@ -8,11 +8,12 @@ import java.util.stream.IntStream;
 
 public class Backlog {
 
-	private int storyNumber = 1;
+	private int storyNumber;
 	private int replenishmentRate;
 
 	private Backlog(int replenishmentRate) {
 		this.replenishmentRate = replenishmentRate;
+		resetStoryNumber();
 	}
 
 	public static Backlog backlog(int replenishmentRate) {
@@ -21,6 +22,10 @@ public class Backlog {
 
 	public void withReplenishmentRate(int replenishmentRate) {
 		this.replenishmentRate = replenishmentRate;
+	}
+
+	public void resetStoryNumber() {
+		storyNumber = 1;
 	}
 
 	public List<Story> stories() {

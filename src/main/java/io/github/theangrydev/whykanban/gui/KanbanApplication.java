@@ -17,6 +17,7 @@ import org.reactfx.EventSource;
 
 import java.util.function.Supplier;
 
+import static io.github.theangrydev.whykanban.gui.Column.column;
 import static io.github.theangrydev.whykanban.gui.KanbanBoardPane.kanbanBoardPane;
 import static io.github.theangrydev.whykanban.gui.MouseEvents.leftClicks;
 import static io.github.theangrydev.whykanban.gui.StatisticTicker.statisticWithLabel;
@@ -35,6 +36,10 @@ public class KanbanApplication extends Application {
     private Team team = teamWithOneOfEachSpecialist();
     private Backlog backlog = Backlog.backlog(1);
     private Simulation simulation = Simulation.simulation(backlog, kanbanBoard, team);
+    private StatisticTicker leadTimeTicker;
+    private StatisticTicker storiesPerDayTicker;
+    private StatisticTicker totalStoriesCompletedTicker;
+    private StatisticTicker totalDaysCompletedTicker;
 
     private Team teamWithOneOfEachSpecialist() {
         Team team = Team.team();
@@ -117,18 +122,33 @@ public class KanbanApplication extends Application {
     }
 
     private Column statisticsColumn() {
-        StatisticTicker leadTimeTicker = statisticWithLabel("Average Lead Time", "%.2f days", averageLeadTimes);
-        StatisticTicker storiesPerDayTicker = statisticWithLabel("Stories Completed Per Day", "%.2f stories", storiesCompletedPerDay);
-        StatisticTicker totalStoriesCompletedTicker = statisticWithLabel("Stories Completed", "%d stories", totalStoriesCompleted);
-        StatisticTicker totalDaysCompletedTicker = statisticWithLabel("Days Completed", "%d days", totalDaysCompleted);
+        leadTimeTicker = statisticWithLabel("Average Lead Time", "%.2f days", averageLeadTimes);
+        storiesPerDayTicker = statisticWithLabel("Stories Completed Per Day", "%.2f stories", storiesCompletedPerDay);
+        totalStoriesCompletedTicker = statisticWithLabel("Stories Completed", "%d stories", totalStoriesCompleted);
+        totalDaysCompletedTicker = statisticWithLabel("Days Completed", "%d days", totalDaysCompleted);
 
-        return Column.column("Statistics", leadTimeTicker, storiesPerDayTicker, totalStoriesCompletedTicker, totalDaysCompletedTicker);
+        return column("Statistics", leadTimeTicker, storiesPerDayTicker, totalStoriesCompletedTicker, totalDaysCompletedTicker, resetStatisticsButton());
     }
 
     private Button advanceDayButton() {
         Button button = new Button("Advance Day");
         leftClicks(button).subscribe(click -> advanceOneDay());
         return button;
+    }
+
+    private Button resetStatisticsButton() {
+        Button button = new Button("Reset Statistics");
+        leftClicks(button).subscribe(click -> resetStatistics());
+        return button;
+    }
+
+    private void resetStatistics() {
+        backlog.resetStoryNumber();
+        simulation = Simulation.simulation(backlog, kanbanBoard, team);
+        leadTimeTicker.clear();
+        storiesPerDayTicker.clear();
+        totalStoriesCompletedTicker.clear();
+        totalDaysCompletedTicker.clear();
     }
 
     private void advanceOneDay() {

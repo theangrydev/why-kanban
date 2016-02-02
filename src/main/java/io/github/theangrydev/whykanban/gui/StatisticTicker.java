@@ -8,9 +8,12 @@ import org.reactfx.EventStream;
 
 public class StatisticTicker extends GridPane {
 
+    private final Text tickerText;
+
     private StatisticTicker(String statisticName, String statisticDisplayFormat, EventStream<?> statisticSource) {
         add(new Text(statisticName), 0, 0);
-        add(statisticTicker(statisticSource, statisticDisplayFormat), 0, 1);
+        tickerText = statisticTicker(statisticSource, statisticDisplayFormat);
+        add(tickerText, 0, 1);
     }
 
     public static StatisticTicker statisticWithLabel(String statisticName, String statisticDisplayFormat, EventStream<?> statisticSource) {
@@ -26,5 +29,9 @@ public class StatisticTicker extends GridPane {
 
     private static String displayStatistic(Object statistic, String statisticDisplayFormat) {
         return String.format(statisticDisplayFormat, statistic);
+    }
+
+    public void clear() {
+        tickerText.setText("");
     }
 }
