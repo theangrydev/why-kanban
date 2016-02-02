@@ -32,7 +32,7 @@ public class KanbanApplication extends Application {
     private static final int DEFAULT_WIP_LIMIT = 99;
     private static final int DEFAULT_TEAM_SIZE = 1;
 
-    private KanbanBoard kanbanBoard = KanbanBoard.emptyBoard().withWorkInProgressLimit(2);
+    private KanbanBoard kanbanBoard = KanbanBoard.emptyBoard().withUniformWorkInProgressLimit(2);
     private Team team = teamWithOneOfEachSpecialist();
     private Backlog backlog = Backlog.backlog(1);
     private Simulation simulation = Simulation.simulation(backlog, kanbanBoard, team);
@@ -99,7 +99,7 @@ public class KanbanApplication extends Application {
     }
 
     private void modifyWorkInProgressLimit(int workInProgressLimit) {
-        kanbanBoard.withWorkInProgressLimit(workInProgressLimit);
+        kanbanBoard.withUniformWorkInProgressLimit(workInProgressLimit);
     }
 
     private void modifyAnalystCount(int analystCount) {

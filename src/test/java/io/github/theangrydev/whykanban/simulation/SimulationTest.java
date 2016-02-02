@@ -37,7 +37,7 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 	})
 	@Test
 	public void averageLeadTimeIsBoundedWhenAWorkInProgressLimitIsUsedAndUniformStoriesArePlayedInTheOrderTheyArrive(String numberOfDays, String leadTimeUpperBound) {
-		Simulation simulation = Simulation.simulation(Backlog.backlog(2), KanbanBoard.emptyBoard().withWorkInProgressLimit(2), teamWithOneOfEachSpecialist());
+		Simulation simulation = Simulation.simulation(Backlog.backlog(2), KanbanBoard.emptyBoard().withUniformWorkInProgressLimit(2), teamWithOneOfEachSpecialist());
 
 		simulation.advanceDays(Integer.parseInt(numberOfDays));
 
@@ -67,8 +67,8 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 	})
 	@Test
 	public void throughputIsDecreasedWhenWorkInProgressLimitsAreSetTooLow(String numberOfDays) {
-		Simulation simulationWithTooSmallWorkInProgress = Simulation.simulation(Backlog.backlog(20), KanbanBoard.emptyBoard().withWorkInProgressLimit(1), teamWithTwoOfEachSpecialist());
-		Simulation simulationWithLargeEnoughWorkInProgress = Simulation.simulation(Backlog.backlog(20), KanbanBoard.emptyBoard().withWorkInProgressLimit(2), teamWithTwoOfEachSpecialist());
+		Simulation simulationWithTooSmallWorkInProgress = Simulation.simulation(Backlog.backlog(20), KanbanBoard.emptyBoard().withUniformWorkInProgressLimit(1), teamWithTwoOfEachSpecialist());
+		Simulation simulationWithLargeEnoughWorkInProgress = Simulation.simulation(Backlog.backlog(20), KanbanBoard.emptyBoard().withUniformWorkInProgressLimit(2), teamWithTwoOfEachSpecialist());
 
 		simulationWithTooSmallWorkInProgress.advanceDays(Integer.parseInt(numberOfDays));
 		simulationWithLargeEnoughWorkInProgress.advanceDays(Integer.parseInt(numberOfDays));

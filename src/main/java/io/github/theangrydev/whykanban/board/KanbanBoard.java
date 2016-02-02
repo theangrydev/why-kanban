@@ -38,13 +38,33 @@ public class KanbanBoard implements KanbanBoardState {
 		return new KanbanBoard();
 	}
 
-	public KanbanBoard withWorkInProgressLimit(int workInProgressLimit) {
-		storiesReadyToPlay.setWorkInProgressLimit(workInProgressLimit);
-		storiesInAnalysis.setWorkInProgressLimit(workInProgressLimit);
-		storiesInDevelopment.setWorkInProgressLimit(workInProgressLimit);
-		storiesWaitingForTest.setWorkInProgressLimit(workInProgressLimit);
-		storiesInTesting.setWorkInProgressLimit(workInProgressLimit);
+	public KanbanBoard withUniformWorkInProgressLimit(int workInProgressLimit) {
+		withReadyToPlayWorkInProgressLimit(workInProgressLimit);
+		withAnalysisWorkInProgressLimit(workInProgressLimit);
+		withDevelopmentWorkInProgressLimit(workInProgressLimit);
+		withWaitingForTestWorkInProgressLimit(workInProgressLimit);
+		withTestingWorkInProgressLimit(workInProgressLimit);
 		return this;
+	}
+
+	public void withTestingWorkInProgressLimit(int workInProgressLimit) {
+		storiesInTesting.setWorkInProgressLimit(workInProgressLimit);
+	}
+
+	public void withWaitingForTestWorkInProgressLimit(int workInProgressLimit) {
+		storiesWaitingForTest.setWorkInProgressLimit(workInProgressLimit);
+	}
+
+	public void withDevelopmentWorkInProgressLimit(int workInProgressLimit) {
+		storiesInDevelopment.setWorkInProgressLimit(workInProgressLimit);
+	}
+
+	public void withAnalysisWorkInProgressLimit(int workInProgressLimit) {
+		storiesInAnalysis.setWorkInProgressLimit(workInProgressLimit);
+	}
+
+	public void withReadyToPlayWorkInProgressLimit(int workInProgressLimit) {
+		storiesReadyToPlay.setWorkInProgressLimit(workInProgressLimit);
 	}
 
 	@Override
