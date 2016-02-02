@@ -85,7 +85,7 @@ public class KanbanBoard implements KanbanBoardState {
 	}
 
 	private void pushSnapshot() {
-		boardChanges.push(snapshot(this));
+		boardChanges.push(snapshot(storiesReadyToPlay(), storiesInAnalysis(), storiesInDevelopment(), storiesWaitingForTest(), storiesInTesting(), storiesCompleted()));
 	}
 
 	public void moveToAnalysis(ReadyToPlayStory readyToPlayStory) {

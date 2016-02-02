@@ -12,6 +12,7 @@ public class Simulation {
 	private Day currentDay;
 	private LeadTimeDistribution leadTimeDistribution;
 	private ThroughputRecorder throughputRecorder;
+	private CompletedStoriesRecorder completedStoriesRecorder;
 
 	private Simulation(Backlog backlog, KanbanBoard kanbanBoard, Team team) {
 		this.backlog = backlog;
@@ -20,6 +21,7 @@ public class Simulation {
 		this.currentDay = Day.firstDay();
 		this.leadTimeDistribution = LeadTimeDistribution.leadTimeDistribution();
 		this.throughputRecorder = ThroughputRecorder.throughputRecorder();
+		this.completedStoriesRecorder = CompletedStoriesRecorder.completedStoriesRecorder();
 	}
 
 	public static Simulation simulation(Backlog backlog, KanbanBoard kanbanBoard, Team team) {
@@ -27,13 +29,14 @@ public class Simulation {
 	}
 
 	public void advanceOneDay() {
+		currentDay = currentDay.nextDay();
 		backlog.stories().stream().peek(story -> story.markReady(currentDay)).forEach(kanbanBoard::addReadyToPlayStory);
 		team.doWork(kanbanBoard);
 		kanbanBoard.storiesCompleted().stream().map(CompletedStory::story).forEach(story -> story.markComplete(currentDay));
 		leadTimeDistribution.recordDay(currentDay, kanbanBoard);
 		throughputRecorder.recordDay(currentDay, kanbanBoard);
+		completedStoriesRecorder.recordDay(currentDay, kanbanBoard);
 		kanbanBoard.removeCompletedStories();
-		currentDay = currentDay.nextDay();
 	}
 
 	public double averageLeadTime() {
@@ -52,5 +55,13 @@ public class Simulation {
 		for (int i = 0; i < numberOfDays; i++) {
 			advanceOneDay();
 		}
+	}
+
+	public int currentDayNumber() {
+		return currentDay.dayNumber();
+	}
+
+	public int totalStoriesCompleted() {
+		return completedStoriesRecorder.totalStoriesCompleted();
 	}
 }

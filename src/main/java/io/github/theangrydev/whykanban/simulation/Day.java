@@ -9,7 +9,7 @@ public class Day {
 	}
 
 	public static Day firstDay() {
-		return new Day(1);
+		return new Day(0);
 	}
 
 	public int dayNumber() {

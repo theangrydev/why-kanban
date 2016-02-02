@@ -1,13 +1,15 @@
 package io.github.theangrydev.whykanban.gui;
 
+import io.github.theangrydev.whykanban.board.KanbanBoard;
 import io.github.theangrydev.whykanban.board.KanbanBoardState;
 import io.github.theangrydev.whykanban.board.Story;
 import io.github.theangrydev.whykanban.board.StoryInLane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import org.reactfx.EventStream;
 import org.reactfx.util.FxTimer;
 
 import java.time.Duration;
@@ -16,9 +18,12 @@ import java.util.Deque;
 import java.util.List;
 import java.util.function.Function;
 
+import static java.util.Collections.nCopies;
+
 public class KanbanBoardPane extends GridPane {
 
     private static final Duration UPDATE_INTERVAL = Duration.ofMillis(100);
+    private static final int TOTAL_COLUMNS = 6;
     private static final int READY_COLUMN = 0;
     private static final int ANALYSIS_COLUMN = 1;
     private static final int DEVELOPMENT_COLUMN = 2;
@@ -28,11 +33,19 @@ public class KanbanBoardPane extends GridPane {
 
     private Deque<KanbanBoardState> pendingSnapshots = new ArrayDeque<>();
 
-    public static KanbanBoardPane kanbanBoardPane(EventStream<KanbanBoardState> kanbanBoardChanges) {
+    public static KanbanBoardPane kanbanBoardPane(KanbanBoard kanbanBoard) {
         KanbanBoardPane kanbanBoardPane = new KanbanBoardPane();
-        kanbanBoardChanges.subscribe(kanbanBoardPane::remember);
+        kanbanBoardPane.getColumnConstraints().addAll(columnConstraints());
+        kanbanBoard.boardChanges().subscribe(kanbanBoardPane::remember);
         FxTimer.runPeriodically(UPDATE_INTERVAL, kanbanBoardPane::pollSnapshot);
+        kanbanBoardPane.update(kanbanBoard);
         return kanbanBoardPane;
+    }
+
+    public static List<ColumnConstraints> columnConstraints() {
+        ColumnConstraints columnConstraints = new ColumnConstraints();
+        columnConstraints.setPercentWidth(100 / TOTAL_COLUMNS);
+        return nCopies(TOTAL_COLUMNS, columnConstraints);
     }
 
     private void remember(KanbanBoardState current) {
@@ -62,11 +75,14 @@ public class KanbanBoardPane extends GridPane {
     }
 
     private void addStories(KanbanBoardState current, Function<KanbanBoardState, List<? extends StoryInLane>> storiesOfType, int column) {
+        FlowPane bucket = new FlowPane();
+        bucket.setHgap(2);
         List<? extends StoryInLane> stories = storiesOfType.apply(current);
-        for (int i = 0; i < stories.size(); i++) {
-            Story story = stories.get(i).story();
-            add(story(String.format("#%d", story.storyNumber())), column, i + 1);
+        for (StoryInLane storyInLane : stories) {
+            Story story = storyInLane.story();
+            bucket.getChildren().add(story(String.format("#%d", story.storyNumber())));
         }
+        add(bucket, column, 1);
     }
 
     private void addHeaders() {

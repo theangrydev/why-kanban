@@ -8,21 +8,21 @@ import org.reactfx.EventStream;
 
 public class StatisticTicker extends GridPane {
 
-    public static StatisticTicker statisticWithLabel(String statisticName, String statisticUnit, EventStream<Double> statisticSource) {
+    public static StatisticTicker statisticWithLabel(String statisticName, String statisticDisplayFormat, EventStream<?> statisticSource) {
         StatisticTicker statisticTicker = new StatisticTicker();
         statisticTicker.add(new Text(statisticName), 0, 0);
-        statisticTicker.add(statisticTicker(statisticSource, statisticUnit), 0, 1);
+        statisticTicker.add(statisticTicker(statisticSource, statisticDisplayFormat), 0, 1);
         return statisticTicker;
     }
 
-    private static Text statisticTicker(EventStream<Double> statisticSource, String statisticUnit) {
+    private static Text statisticTicker(EventStream<?> statisticSource, String statisticDisplayFormat) {
         Text statisticValue = new Text();
         statisticValue.setFont(Font.font(null, FontWeight.BOLD, 15));
-        statisticSource.map(statistic -> displayStatistic(statistic, statisticUnit)).subscribe(statisticValue::setText);
+        statisticSource.map(statistic -> displayStatistic(statistic, statisticDisplayFormat)).subscribe(statisticValue::setText);
         return statisticValue;
     }
 
-    private static String displayStatistic(Double statistic, String statisticUnit) {
-        return String.format("%.2f %s", statistic, statisticUnit);
+    private static String displayStatistic(Object statistic, String statisticDisplayFormat) {
+        return String.format(statisticDisplayFormat, statistic);
     }
 }

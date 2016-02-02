@@ -10,7 +10,7 @@ public interface WithDayExamples {
 	default Day dayNumber(int dayNumber) {
 		Preconditions.checkArgument(dayNumber >= 1, "Day number must be at least 1");
 		Day day = Day.firstDay();
-		for (int i = 1; i < dayNumber; i++) {
+		for (int i = 0; i < dayNumber; i++) {
 			day = day.nextDay();
 		}
 		return day;

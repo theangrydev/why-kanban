@@ -20,8 +20,8 @@ public class KanbanBoardSnapshot implements KanbanBoardState {
         this.storiesCompleted = storiesCompleted;
     }
 
-    public static KanbanBoardState snapshot(KanbanBoard kanbanBoard) {
-        return new KanbanBoardSnapshot(kanbanBoard.storiesReadyToPlay(), kanbanBoard.storiesInAnalysis(), kanbanBoard.storiesInDevelopment(), kanbanBoard.storiesWaitingForTest(), kanbanBoard.storiesInTesting(), kanbanBoard.storiesCompleted());
+    public static KanbanBoardState snapshot(List<ReadyToPlayStory> storiesReadyToPlay, List<InAnalysisStory> storiesInAnalysis, List<InDevelopmentStory> storiesInDevelopment, List<WaitingForTestStory> storiesWaitingForTest, List<InTestingStory> storiesInTesting, List<CompletedStory> storiesCompleted) {
+        return new KanbanBoardSnapshot(storiesReadyToPlay, storiesInAnalysis, storiesInDevelopment, storiesWaitingForTest, storiesInTesting, storiesCompleted);
     }
 
     @Override

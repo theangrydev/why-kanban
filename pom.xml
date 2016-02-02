@@ -46,7 +46,7 @@
 		<mockito.version>1.10.19</mockito.version>
 		<yatspec.version>1.14</yatspec.version>
 		<junit.version>4.12</junit.version>
-		<guava.version>10.0</guava.version>
+		<guava.version>19.0</guava.version>
 		<apache.commons.math.version>3.6</apache.commons.math.version>
         <reactfx.version>1.4.1</reactfx.version>
         <findbugs.annotations.version>3.0.1u2</findbugs.annotations.version>

@@ -7,7 +7,7 @@ public class DayTest implements WithAssertions, WithDayExamples {
 
 	@Test
 	public void firstDayNumberIsOne() {
-		assertThat(Day.firstDay().dayNumber()).isEqualTo(1);
+		assertThat(Day.firstDay().dayNumber()).isEqualTo(0);
 	}
 
 	@Test
