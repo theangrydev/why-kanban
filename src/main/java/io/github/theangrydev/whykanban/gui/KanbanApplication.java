@@ -27,6 +27,10 @@ import static io.github.theangrydev.whykanban.team.Tester.tester;
 
 public class KanbanApplication extends Application {
 
+    private static final int DEFAULT_REPLENISHMENT_RATE = 1;
+    private static final int DEFAULT_WIP_LIMIT = 99;
+    private static final int DEFAULT_TEAM_SIZE = 1;
+
     private KanbanBoard kanbanBoard = KanbanBoard.emptyBoard().withWorkInProgressLimit(2);
     private Team team = teamWithOneOfEachSpecialist();
     private Backlog backlog = Backlog.backlog(1);
@@ -65,19 +69,19 @@ public class KanbanApplication extends Application {
         FlowPane controls = new FlowPane();
         controls.setHgap(5);
 
-        SettingSpinner replenishmentRate = settingSpinner("Replenishment Rate", 1);
+        SettingSpinner replenishmentRate = settingSpinner("Replenishment Rate", DEFAULT_REPLENISHMENT_RATE);
         replenishmentRate.setting().subscribe(this::modifyReplenishmentRate);
 
-        SettingSpinner workInProgressLimit = settingSpinner("WIP Limit", 99);
+        SettingSpinner workInProgressLimit = settingSpinner("WIP Limit", DEFAULT_WIP_LIMIT);
         workInProgressLimit.setting().subscribe(this::modifyWorkInProgressLimit);
 
-        SettingSpinner analysts = settingSpinner("Analysts", 1);
+        SettingSpinner analysts = settingSpinner("Analysts", DEFAULT_TEAM_SIZE);
         analysts.setting().subscribe(this::modifyAnalystCount);
 
-        SettingSpinner developers = settingSpinner("Developers", 1);
+        SettingSpinner developers = settingSpinner("Developers", DEFAULT_TEAM_SIZE);
         developers.setting().subscribe(this::modifyDeveloperCount);
 
-        SettingSpinner testers = settingSpinner("Testers", 1);
+        SettingSpinner testers = settingSpinner("Testers", DEFAULT_TEAM_SIZE);
         testers.setting().subscribe(this::modifyTesterCount);
 
         controls.getChildren().addAll(advanceDayButton(), replenishmentRate, workInProgressLimit, analysts, developers, testers);
