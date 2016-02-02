@@ -120,4 +120,14 @@ public class KanbanBoard implements KanbanBoardState {
 		}
 		pushSnapshot();
 	}
+
+	public void clear() {
+		storiesReadyToPlay.clear();
+		storiesInAnalysis.clear();
+		storiesInDevelopment.clear();
+		storiesWaitingForTest.clear();
+		storiesInTesting.clear();
+		storiesCompleted.clear();
+		pushSnapshot();
+	}
 }

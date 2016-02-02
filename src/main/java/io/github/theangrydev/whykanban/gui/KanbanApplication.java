@@ -127,7 +127,7 @@ public class KanbanApplication extends Application {
         totalStoriesCompletedTicker = statisticWithLabel("Stories Completed", "%d stories", totalStoriesCompleted);
         totalDaysCompletedTicker = statisticWithLabel("Days Completed", "%d days", totalDaysCompleted);
 
-        return column("Statistics", leadTimeTicker, storiesPerDayTicker, totalStoriesCompletedTicker, totalDaysCompletedTicker, resetStatisticsButton());
+        return column("Statistics", leadTimeTicker, storiesPerDayTicker, totalStoriesCompletedTicker, totalDaysCompletedTicker, resetButton());
     }
 
     private Button advanceDayButton() {
@@ -136,14 +136,15 @@ public class KanbanApplication extends Application {
         return button;
     }
 
-    private Button resetStatisticsButton() {
-        Button button = new Button("Reset Statistics");
-        leftClicks(button).subscribe(click -> resetStatistics());
+    private Button resetButton() {
+        Button button = new Button("Reset");
+        leftClicks(button).subscribe(click -> reset());
         return button;
     }
 
-    private void resetStatistics() {
+    private void reset() {
         backlog.resetStoryNumber();
+        kanbanBoard.clear();
         simulation = Simulation.simulation(backlog, kanbanBoard, team);
         leadTimeTicker.clear();
         storiesPerDayTicker.clear();
