@@ -65,7 +65,7 @@ public class KanbanApplication extends Application {
         FlowPane controls = new FlowPane();
         controls.setHgap(5);
 
-        SettingSpinner replenishmentRate = settingSpinner("Replenishment Rate", 2);
+        SettingSpinner replenishmentRate = settingSpinner("Replenishment Rate", 1);
         replenishmentRate.setting().subscribe(this::modifyReplenishmentRate);
 
         SettingSpinner workInProgressLimit = settingSpinner("WIP Limit", 99);
