@@ -17,8 +17,8 @@ public class BacklogTest implements WithAssertions {
 	})
 	@Test
 	public void backlog(String replenishmentRate, String numberOfStories) {
-		Backlog backlog = Backlog.backlog(Integer.valueOf(replenishmentRate));
+		Backlog backlog = Backlog.backlog(Integer.parseInt(replenishmentRate));
 
-		assertThat(backlog.stories()).hasSize(Integer.valueOf(numberOfStories));
+		assertThat(backlog.stories()).hasSize(Integer.parseInt(numberOfStories));
 	}
 }

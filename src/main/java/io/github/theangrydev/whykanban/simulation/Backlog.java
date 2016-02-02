@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 
 public class Backlog {
 
+	private int storyNumber = 1;
 	private int replenishmentRate;
 
 	private Backlog(int replenishmentRate) {
@@ -19,6 +20,6 @@ public class Backlog {
 	}
 
 	public List<Story> stories() {
-		return IntStream.range(0, replenishmentRate).mapToObj(operand -> Story.aStory()).collect(Collectors.toList());
+		return IntStream.range(0, replenishmentRate).mapToObj(operand -> Story.aStory(storyNumber++)).collect(Collectors.toList());
 	}
 }

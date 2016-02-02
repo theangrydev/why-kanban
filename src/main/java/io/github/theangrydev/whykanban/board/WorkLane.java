@@ -1,9 +1,11 @@
 package io.github.theangrydev.whykanban.board;
 
 import com.google.common.base.Preconditions;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
 
+@SuppressFBWarnings(value = "SE_NO_SERIALVERSIONID", justification = "Will never be serialized")
 public class WorkLane<StoryType> extends ArrayList<StoryType> {
 
 	private int workInProgressLimit;

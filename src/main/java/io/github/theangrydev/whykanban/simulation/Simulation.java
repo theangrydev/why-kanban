@@ -44,6 +44,10 @@ public class Simulation {
 		return throughputRecorder.storiesCompletedPerDay();
 	}
 
+	public KanbanBoard kanbanBoard() {
+		return kanbanBoard;
+	}
+
 	public void advanceDays(int numberOfDays) {
 		for (int i = 0; i < numberOfDays; i++) {
 			advanceOneDay();

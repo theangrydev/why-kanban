@@ -2,11 +2,17 @@ package io.github.theangrydev.whykanban.board;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.reactfx.EventSource;
+import org.reactfx.EventStream;
 
 import java.util.List;
 import java.util.function.Function;
 
-public class KanbanBoard {
+import static io.github.theangrydev.whykanban.board.KanbanBoardSnapshot.snapshot;
+
+public class KanbanBoard implements KanbanBoardState {
+
+	private EventSource<KanbanBoardState> boardChanges;
 	private WorkLane<ReadyToPlayStory> storiesReadyToPlay;
 	private WorkLane<InAnalysisStory> storiesInAnalysis;
 	private WorkLane<InDevelopmentStory> storiesInDevelopment;
@@ -15,12 +21,17 @@ public class KanbanBoard {
 	private WorkLane<CompletedStory> storiesCompleted;
 
 	private KanbanBoard() {
+		boardChanges = new EventSource<>();
 		storiesReadyToPlay = new WorkLane<>();
 		storiesInAnalysis = new WorkLane<>();
 		storiesInDevelopment = new WorkLane<>();
 		storiesWaitingForTest = new WorkLane<>();
 		storiesInTesting = new WorkLane<>();
 		storiesCompleted = new WorkLane<>();
+	}
+
+	public EventStream<KanbanBoardState> boardChanges() {
+		return boardChanges;
 	}
 
 	public static KanbanBoard emptyBoard() {
@@ -36,26 +47,32 @@ public class KanbanBoard {
 		return this;
 	}
 
+	@Override
 	public List<ReadyToPlayStory> storiesReadyToPlay() {
 		return Lists.newArrayList(storiesReadyToPlay);
 	}
 
+	@Override
 	public List<InAnalysisStory> storiesInAnalysis() {
 		return Lists.newArrayList(storiesInAnalysis);
 	}
 
+	@Override
 	public List<InDevelopmentStory> storiesInDevelopment() {
 		return Lists.newArrayList(storiesInDevelopment);
 	}
 
+	@Override
 	public List<WaitingForTestStory> storiesWaitingForTest() {
 		return Lists.newArrayList(storiesWaitingForTest);
 	}
 
+	@Override
 	public List<CompletedStory> storiesCompleted() {
 		return Lists.newArrayList(storiesCompleted);
 	}
 
+	@Override
 	public List<InTestingStory> storiesInTesting() {
 		return Lists.newArrayList(storiesInTesting);
 	}
@@ -64,6 +81,11 @@ public class KanbanBoard {
 		if (!storiesReadyToPlay.workInProgressLimitHasBeenReached()) {
 			storiesReadyToPlay.add(ReadyToPlayStory.readyToPlayStory(story));
 		}
+		pushSnapshot();
+	}
+
+	private void pushSnapshot() {
+		boardChanges.push(snapshot(this));
 	}
 
 	public void moveToAnalysis(ReadyToPlayStory readyToPlayStory) {
@@ -96,5 +118,6 @@ public class KanbanBoard {
 			fromStories.remove(story);
 			toStories.add(transition.apply(story.story()));
 		}
+		pushSnapshot();
 	}
 }

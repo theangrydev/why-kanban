@@ -24,7 +24,7 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 	public void averageLeadTimeIncreasesWhenTheTeamWorksSlowerThanTheBacklogRate(String numberOfDays, String averageLeadTime) {
 		Simulation simulation = Simulation.simulation(Backlog.backlog(2), KanbanBoard.emptyBoard(), teamWithOneOfEachSpecialist());
 
-		simulation.advanceDays(Integer.valueOf(numberOfDays));
+		simulation.advanceDays(Integer.parseInt(numberOfDays));
 
 		assertThat(simulation.averageLeadTime()).isCloseTo(Double.valueOf(averageLeadTime), withPercentage(1));
 	}
@@ -39,7 +39,7 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 	public void averageLeadTimeIsBoundedWhenAWorkInProgressLimitIsUsedAndUniformStoriesArePlayedInTheOrderTheyArrive(String numberOfDays, String leadTimeUpperBound) {
 		Simulation simulation = Simulation.simulation(Backlog.backlog(2), KanbanBoard.emptyBoard().withWorkInProgressLimit(2), teamWithOneOfEachSpecialist());
 
-		simulation.advanceDays(Integer.valueOf(numberOfDays));
+		simulation.advanceDays(Integer.parseInt(numberOfDays));
 
 		assertThat(simulation.averageLeadTime()).isLessThan(Double.valueOf(leadTimeUpperBound));
 	}
@@ -54,7 +54,7 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 	public void throughputRemainsConstantWhenTheTeamWorksSlowerThanTheBacklogRate(String numberOfDays, String averageLeadTime) {
 		Simulation simulation = Simulation.simulation(Backlog.backlog(2), KanbanBoard.emptyBoard(), teamWithOneOfEachSpecialist());
 
-		simulation.advanceDays(Integer.valueOf(numberOfDays));
+		simulation.advanceDays(Integer.parseInt(numberOfDays));
 
 		assertThat(simulation.storiesCompletedPerDay()).isEqualTo(Double.valueOf(averageLeadTime));
 	}
@@ -70,8 +70,8 @@ public class SimulationTest implements WithAssertions, WithTeamExamples {
 		Simulation simulationWithTooSmallWorkInProgress = Simulation.simulation(Backlog.backlog(20), KanbanBoard.emptyBoard().withWorkInProgressLimit(1), teamWithTwoOfEachSpecialist());
 		Simulation simulationWithLargeEnoughWorkInProgress = Simulation.simulation(Backlog.backlog(20), KanbanBoard.emptyBoard().withWorkInProgressLimit(2), teamWithTwoOfEachSpecialist());
 
-		simulationWithTooSmallWorkInProgress.advanceDays(Integer.valueOf(numberOfDays));
-		simulationWithLargeEnoughWorkInProgress.advanceDays(Integer.valueOf(numberOfDays));
+		simulationWithTooSmallWorkInProgress.advanceDays(Integer.parseInt(numberOfDays));
+		simulationWithLargeEnoughWorkInProgress.advanceDays(Integer.parseInt(numberOfDays));
 
 		assertThat(simulationWithTooSmallWorkInProgress.storiesCompletedPerDay()).isLessThan(simulationWithLargeEnoughWorkInProgress.storiesCompletedPerDay());
 	}
