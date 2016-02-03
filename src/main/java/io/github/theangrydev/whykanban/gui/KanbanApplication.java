@@ -29,7 +29,6 @@ import static io.github.theangrydev.whykanban.team.Tester.tester;
 public class KanbanApplication extends Application {
 
     private static final int DEFAULT_REPLENISHMENT_RATE = 1;
-    private static final int DEFAULT_WIP_LIMIT = 99;
     private static final int DEFAULT_TEAM_SIZE = 1;
 
     private KanbanBoard kanbanBoard = KanbanBoard.emptyBoard().withUniformWorkInProgressLimit(2);
@@ -60,11 +59,11 @@ public class KanbanApplication extends Application {
         root.setPadding(new Insets(10));
         root.setRight(statisticsColumn());
         KanbanBoardPane kanbanBoardPane = kanbanBoardPane(kanbanBoard);
-        kanbanBoardPane.readyWorkInProgressLimit().subscribe(this::modifyReadyToPlayWorkInProgressLimit);
-        kanbanBoardPane.analysisWorkInProgressLimit().subscribe(this::modifyAnalysisWorkInProgressLimit);
-        kanbanBoardPane.developmentWorkInProgressLimit().subscribe(this::modifyDevelopmentWorkInProgressLimit);
-        kanbanBoardPane.waitingForTestWorkInProgressLimit().subscribe(this::modifyWaitingForTestWorkInProgressLimit);
-        kanbanBoardPane.testingWorkInProgressLimit().subscribe(this::modifyTestingWorkInProgressLimit);
+        kanbanBoardPane.readyWorkInProgressLimit().subscribe(kanbanBoard::withReadyToPlayWorkInProgressLimit);
+        kanbanBoardPane.analysisWorkInProgressLimit().subscribe(kanbanBoard::withAnalysisWorkInProgressLimit);
+        kanbanBoardPane.developmentWorkInProgressLimit().subscribe(kanbanBoard::withDevelopmentWorkInProgressLimit);
+        kanbanBoardPane.waitingForTestWorkInProgressLimit().subscribe(kanbanBoard::withWaitingForTestWorkInProgressLimit);
+        kanbanBoardPane.testingWorkInProgressLimit().subscribe(kanbanBoard::withTestingWorkInProgressLimit);
 
         root.setCenter(kanbanBoardPane);
         root.setBottom(controls());
@@ -82,7 +81,7 @@ public class KanbanApplication extends Application {
         controls.setHgap(5);
 
         SettingSpinner replenishmentRate = settingSpinner("Replenishment Rate", DEFAULT_REPLENISHMENT_RATE);
-        replenishmentRate.setting().subscribe(this::modifyReplenishmentRate);
+        replenishmentRate.setting().subscribe(backlog::withReplenishmentRate);
 
         SettingSpinner analysts = settingSpinner("Analysts", DEFAULT_TEAM_SIZE);
         analysts.setting().subscribe(this::modifyAnalystCount);
@@ -96,30 +95,6 @@ public class KanbanApplication extends Application {
         controls.getChildren().addAll(advanceDayButton(), replenishmentRate, analysts, developers, testers);
 
         return controls;
-    }
-
-    private void modifyReplenishmentRate(int replenishmentRate) {
-        backlog.withReplenishmentRate(replenishmentRate);
-    }
-
-    public void modifyTestingWorkInProgressLimit(int workInProgressLimit) {
-        kanbanBoard.withTestingWorkInProgressLimit(workInProgressLimit);
-    }
-
-    public void modifyWaitingForTestWorkInProgressLimit(int workInProgressLimit) {
-        kanbanBoard.withWaitingForTestWorkInProgressLimit(workInProgressLimit);
-    }
-
-    public void modifyDevelopmentWorkInProgressLimit(int workInProgressLimit) {
-        kanbanBoard.withDevelopmentWorkInProgressLimit(workInProgressLimit);
-    }
-
-    public void modifyAnalysisWorkInProgressLimit(int workInProgressLimit) {
-        kanbanBoard.withAnalysisWorkInProgressLimit(workInProgressLimit);
-    }
-
-    public void modifyReadyToPlayWorkInProgressLimit(int workInProgressLimit) {
-        kanbanBoard.withReadyToPlayWorkInProgressLimit(workInProgressLimit);
     }
 
     private void modifyAnalystCount(int analystCount) {
