@@ -10,6 +10,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import org.reactfx.EventStream;
 
 import java.time.Duration;
 import java.util.ArrayDeque;
@@ -30,8 +31,9 @@ public class KanbanBoardPane extends GridPane {
     private static final int WAITING_FOR_TEST_COLUMN = 3;
     private static final int TESTING_COLUMN = 4;
     private static final int COMPLETED_COLUMN = 5;
-    private static final int STORIES_ROW = 1;
-    private static final int HEADER_ROW = 0;
+    private static final int STORIES_ROW = 2;
+    private static final int HEADER_ROW = 1;
+    private static final int WIP_ROW = 0;
 
     private Deque<KanbanBoardState> pendingSnapshots = new ArrayDeque<>();
     private FlowPane readyColumn;
@@ -41,8 +43,15 @@ public class KanbanBoardPane extends GridPane {
     private FlowPane testingColumn;
     private FlowPane completedColumn;
 
+    private SettingSpinner readyWorkInProgressLimit;
+    private SettingSpinner analysisWorkInProgressLimit;
+    private SettingSpinner developmentWorkInProgressLimit;
+    private SettingSpinner waitingForTestWorkInProgressLimit;
+    private SettingSpinner testingWorkInProgressLimit;
+
     private KanbanBoardPane(KanbanBoard kanbanBoard) {
         getColumnConstraints().addAll(columnConstraints());
+        addWorkInProgressSpinners();
         addHeaders();
         addBuckets();
 
@@ -50,6 +59,40 @@ public class KanbanBoardPane extends GridPane {
         runPeriodically(UPDATE_INTERVAL, this::pollSnapshot);
 
         update(kanbanBoard);
+    }
+
+    public EventStream<Integer> readyWorkInProgressLimit() {
+        return readyWorkInProgressLimit.setting();
+    }
+
+    public EventStream<Integer> analysisWorkInProgressLimit() {
+        return analysisWorkInProgressLimit.setting();
+    }
+
+    public EventStream<Integer> developmentWorkInProgressLimit() {
+        return developmentWorkInProgressLimit.setting();
+    }
+
+    public EventStream<Integer> testingWorkInProgressLimit() {
+        return testingWorkInProgressLimit.setting();
+    }
+
+    public EventStream<Integer> waitingForTestWorkInProgressLimit() {
+        return waitingForTestWorkInProgressLimit.setting();
+    }
+
+    private void addWorkInProgressSpinners() {
+        readyWorkInProgressLimit = addWorkInProgressSpinner(READY_COLUMN);
+        analysisWorkInProgressLimit = addWorkInProgressSpinner(ANALYSIS_COLUMN);
+        developmentWorkInProgressLimit = addWorkInProgressSpinner(DEVELOPMENT_COLUMN);
+        waitingForTestWorkInProgressLimit = addWorkInProgressSpinner(WAITING_FOR_TEST_COLUMN);
+        testingWorkInProgressLimit = addWorkInProgressSpinner(TESTING_COLUMN);
+    }
+
+    private SettingSpinner addWorkInProgressSpinner(int columnIndex) {
+        SettingSpinner settingSpinner = SettingSpinner.settingSpinner("WIP", 99);
+        add(settingSpinner, columnIndex, WIP_ROW);
+        return settingSpinner;
     }
 
     private void addBuckets() {
@@ -124,8 +167,8 @@ public class KanbanBoardPane extends GridPane {
         addHeader("Completed", COMPLETED_COLUMN);
     }
 
-    private void addHeader(String name, int readyColumn) {
-        add(swimLaneHeader(name), readyColumn, HEADER_ROW);
+    private void addHeader(String name, int columnIndex) {
+        add(swimLaneHeader(name), columnIndex, HEADER_ROW);
     }
 
     private static Text swimLaneHeader(String name) {

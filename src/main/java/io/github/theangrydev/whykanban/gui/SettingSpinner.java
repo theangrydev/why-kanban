@@ -29,8 +29,8 @@ public class SettingSpinner extends GridPane {
 		spinner.setEditable(true);
 	}
 
-	public static SettingSpinner settingSpinner(String teamMemberType, int initialValue) {
-		return new SettingSpinner(teamMemberType, initialValue);
+	public static SettingSpinner settingSpinner(String settingName, int initialValue) {
+		return new SettingSpinner(settingName, initialValue);
 	}
 
 	public EventStream<Integer> setting() {
