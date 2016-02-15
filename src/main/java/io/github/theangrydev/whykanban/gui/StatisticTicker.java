@@ -22,7 +22,7 @@ public class StatisticTicker extends GridPane {
 
     private static Text statisticTicker(EventStream<?> statisticSource, String statisticDisplayFormat) {
         Text statisticValue = new Text();
-        statisticValue.setFont(Font.font(null, FontWeight.BOLD, 15));
+        statisticValue.styleProperty().setValue("-fx-font-size: 1em; -fx-font-weight: bold;");
         statisticSource.map(statistic -> displayStatistic(statistic, statisticDisplayFormat)).subscribe(statisticValue::setText);
         return statisticValue;
     }

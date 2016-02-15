@@ -4,7 +4,6 @@ import io.github.theangrydev.whykanban.board.KanbanBoard;
 import io.github.theangrydev.whykanban.board.KanbanBoardState;
 import io.github.theangrydev.whykanban.board.Story;
 import io.github.theangrydev.whykanban.board.StoryInLane;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
@@ -18,7 +17,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.function.Function;
 
-import static java.util.Collections.nCopies;
+import static io.github.theangrydev.whykanban.gui.PercentageColumnConstraints.percentageConstraints;
 import static org.reactfx.util.FxTimer.runPeriodically;
 
 public class KanbanBoardPane extends GridPane {
@@ -50,7 +49,9 @@ public class KanbanBoardPane extends GridPane {
     private SettingSpinner testingWorkInProgressLimit;
 
     private KanbanBoardPane(KanbanBoard kanbanBoard) {
-        getColumnConstraints().addAll(columnConstraints());
+        setMinWidth(0);
+        setHgap(10);
+        getColumnConstraints().addAll(percentageConstraints(TOTAL_COLUMNS));
         addWorkInProgressSpinners();
         addHeaders();
         addBuckets();
@@ -112,12 +113,6 @@ public class KanbanBoardPane extends GridPane {
         return new KanbanBoardPane(kanbanBoard);
     }
 
-    public static List<ColumnConstraints> columnConstraints() {
-        ColumnConstraints columnConstraints = new ColumnConstraints();
-        columnConstraints.setPercentWidth(100 / TOTAL_COLUMNS);
-        return nCopies(TOTAL_COLUMNS, columnConstraints);
-    }
-
     private void remember(KanbanBoardState current) {
         pendingSnapshots.addLast(current);
     }
@@ -153,7 +148,7 @@ public class KanbanBoardPane extends GridPane {
 
     private FlowPane addBucket(int column) {
         FlowPane bucket = new FlowPane();
-        bucket.setHgap(2);
+        bucket.setHgap(5);
         add(bucket, column, STORIES_ROW);
         return bucket;
     }
@@ -173,13 +168,11 @@ public class KanbanBoardPane extends GridPane {
 
     private static Text swimLaneHeader(String name) {
         Text header = new Text(name);
-        header.setFont(Font.font(null, FontWeight.BOLD, 15));
+        header.styleProperty().setValue("-fx-font-size: 1em; -fx-font-weight: bold;");
         return header;
     }
 
     private static Text story(String name) {
-        Text header = new Text(name);
-        header.setFont(Font.font(null, FontWeight.BOLD, 15));
-        return header;
+        return new Text(name);
     }
 }

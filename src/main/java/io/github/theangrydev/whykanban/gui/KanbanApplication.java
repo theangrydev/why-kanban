@@ -5,12 +5,14 @@ import io.github.theangrydev.whykanban.simulation.Backlog;
 import io.github.theangrydev.whykanban.simulation.Simulation;
 import io.github.theangrydev.whykanban.team.*;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.reactfx.EventSource;
@@ -18,6 +20,7 @@ import org.reactfx.EventSource;
 import java.util.function.Supplier;
 
 import static io.github.theangrydev.whykanban.gui.Column.column;
+import static io.github.theangrydev.whykanban.gui.PercentageColumnConstraints.percentageConstraints;
 import static io.github.theangrydev.whykanban.gui.KanbanBoardPane.kanbanBoardPane;
 import static io.github.theangrydev.whykanban.gui.MouseEvents.leftClicks;
 import static io.github.theangrydev.whykanban.gui.StatisticTicker.statisticWithLabel;
@@ -56,6 +59,7 @@ public class KanbanApplication extends Application {
     @Override
     public void start(Stage primaryStage) {
         BorderPane root = new BorderPane();
+        root.setMinSize(0, 0);
         root.setPadding(new Insets(10));
         root.setRight(statisticsColumn());
         KanbanBoardPane kanbanBoardPane = kanbanBoardPane(kanbanBoard);
@@ -70,29 +74,36 @@ public class KanbanApplication extends Application {
 
         Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
         Scene scene = new Scene(root, visualBounds.getWidth() / 2, visualBounds.getHeight() / 2);
+        scene.getRoot().styleProperty().bind(Bindings.concat("-fx-font-size: ", scene.widthProperty().divide(65)));
 
         primaryStage.setTitle("Why Kanban?");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    public FlowPane controls() {
-        FlowPane controls = new FlowPane();
-        controls.setHgap(5);
+    public Node controls() {
+        GridPane controls = new GridPane();
+        controls.setMinWidth(0);
+        controls.setHgap(10);
+        controls.getColumnConstraints().addAll(percentageConstraints(5));
+
+        controls.add(advanceDayButton(), 0, 0);
 
         SettingSpinner replenishmentRate = settingSpinner("Replenishment Rate", DEFAULT_REPLENISHMENT_RATE);
         replenishmentRate.setting().subscribe(backlog::withReplenishmentRate);
+        controls.add(replenishmentRate, 1, 0);
 
         SettingSpinner analysts = settingSpinner("Analysts", DEFAULT_TEAM_SIZE);
         analysts.setting().subscribe(this::modifyAnalystCount);
+        controls.add(analysts, 2, 0);
 
         SettingSpinner developers = settingSpinner("Developers", DEFAULT_TEAM_SIZE);
         developers.setting().subscribe(this::modifyDeveloperCount);
+        controls.add(developers, 3, 0);
 
         SettingSpinner testers = settingSpinner("Testers", DEFAULT_TEAM_SIZE);
         testers.setting().subscribe(this::modifyTesterCount);
-
-        controls.getChildren().addAll(advanceDayButton(), replenishmentRate, analysts, developers, testers);
+        controls.add(testers, 4, 0);
 
         return controls;
     }
@@ -127,6 +138,8 @@ public class KanbanApplication extends Application {
 
     private Button advanceDayButton() {
         Button button = new Button("Advance Day");
+        button.setMaxWidth(Double.MAX_VALUE);
+        button.setMaxHeight(Double.MAX_VALUE);
         leftClicks(button).subscribe(click -> advanceOneDay());
         return button;
     }
