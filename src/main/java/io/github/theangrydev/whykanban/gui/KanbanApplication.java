@@ -78,7 +78,7 @@ public class KanbanApplication extends Application {
         root.setBottom(controls());
 
         Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
-        Scene scene = new Scene(root, visualBounds.getWidth() / 2, visualBounds.getHeight() / 2);
+        Scene scene = new Scene(root, visualBounds.getWidth() * 0.4, visualBounds.getHeight() * 0.5);
         scene.getRoot().styleProperty().bind(Bindings.concat("-fx-font-size: ", scene.widthProperty().divide(65)));
 
         primaryStage.setTitle("Why Kanban?");
