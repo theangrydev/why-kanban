@@ -13,6 +13,7 @@ public class Simulation {
 	private LeadTimeDistribution leadTimeDistribution;
 	private ThroughputRecorder throughputRecorder;
 	private CompletedStoriesRecorder completedStoriesRecorder;
+	private CumulativeFlowRecorder cumulativeFlowRecorder;
 
 	private Simulation(Backlog backlog, KanbanBoard kanbanBoard, Team team) {
 		this.backlog = backlog;
@@ -22,6 +23,7 @@ public class Simulation {
 		this.leadTimeDistribution = LeadTimeDistribution.leadTimeDistribution();
 		this.throughputRecorder = ThroughputRecorder.throughputRecorder();
 		this.completedStoriesRecorder = CompletedStoriesRecorder.completedStoriesRecorder();
+		this.cumulativeFlowRecorder = CumulativeFlowRecorder.cumulativeFlowRecorder();
 	}
 
 	public static Simulation simulation(Backlog backlog, KanbanBoard kanbanBoard, Team team) {
@@ -36,6 +38,7 @@ public class Simulation {
 		leadTimeDistribution.recordDay(currentDay, kanbanBoard);
 		throughputRecorder.recordDay(currentDay, kanbanBoard);
 		completedStoriesRecorder.recordDay(currentDay, kanbanBoard);
+		cumulativeFlowRecorder.recordDay(currentDay, kanbanBoard);
 		kanbanBoard.removeCompletedStories();
 	}
 
@@ -63,5 +66,9 @@ public class Simulation {
 
 	public int totalStoriesCompleted() {
 		return completedStoriesRecorder.totalStoriesCompleted();
+	}
+
+	public FlowHistory flowHistory() {
+		return cumulativeFlowRecorder.flowHistory();
 	}
 }

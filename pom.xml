@@ -49,8 +49,9 @@
 		<guava.version>19.0</guava.version>
 		<apache.commons.math.version>3.6</apache.commons.math.version>
         <reactfx.version>1.4.1</reactfx.version>
-        <findbugs.annotations.version>3.0.1u2</findbugs.annotations.version>
-    </properties>
+		<jfreechart.version>1.0.19</jfreechart.version>
+		<findbugs.annotations.version>3.0.1u2</findbugs.annotations.version>
+	</properties>
 
 	<build>
 		<!-- Plugin configuration -->
@@ -201,6 +202,13 @@
 			<groupId>org.reactfx</groupId>
 			<artifactId>reactfx</artifactId>
 			<version>${reactfx.version}</version>
+		</dependency>
+
+		<!-- JFreeChart -->
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>${jfreechart.version}</version>
 		</dependency>
 
         <!-- FindBugs Annotations -->

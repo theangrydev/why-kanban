@@ -7,7 +7,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import org.reactfx.EventStream;
 
-import static io.github.theangrydev.whykanban.gui.PercentageColumnConstraints.percentageConstraints;
+import static io.github.theangrydev.whykanban.gui.PercentageConstraints.percentageColumnConstraints;
 import static org.reactfx.EventStreams.valuesOf;
 
 public class SettingSpinner extends GridPane {
@@ -16,7 +16,7 @@ public class SettingSpinner extends GridPane {
 
 	private SettingSpinner(String teamMemberType, int initialValue) {
 		add(new Text(teamMemberType), 0, 0);
-		getColumnConstraints().addAll(percentageConstraints(1));
+		getColumnConstraints().addAll(percentageColumnConstraints(1));
 		spinner = new Spinner<>(0, 100, initialValue);
 		spinner.setMinWidth(50);
 		spinner.setMaxWidth(Double.MAX_VALUE);

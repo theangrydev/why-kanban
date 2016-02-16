@@ -2,13 +2,12 @@ package io.github.theangrydev.whykanban.gui;
 
 import io.github.theangrydev.whykanban.board.KanbanBoard;
 import io.github.theangrydev.whykanban.board.KanbanBoardState;
-import io.github.theangrydev.whykanban.board.Story;
 import io.github.theangrydev.whykanban.board.StoryInLane;
+import io.github.theangrydev.whykanban.simulation.FlowHistory;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 
 import java.time.Duration;
@@ -17,7 +16,9 @@ import java.util.Deque;
 import java.util.List;
 import java.util.function.Function;
 
-import static io.github.theangrydev.whykanban.gui.PercentageColumnConstraints.percentageConstraints;
+import static io.github.theangrydev.whykanban.gui.CumulativeFlowDiagram.cumulativeFlowChart;
+import static io.github.theangrydev.whykanban.gui.PercentageConstraints.percentageColumnConstraints;
+import static io.github.theangrydev.whykanban.gui.PercentageConstraints.percentageRowConstraints;
 import static org.reactfx.util.FxTimer.runPeriodically;
 
 public class KanbanBoardPane extends GridPane {
@@ -31,8 +32,10 @@ public class KanbanBoardPane extends GridPane {
     private static final int TESTING_COLUMN = 4;
     private static final int COMPLETED_COLUMN = 5;
     private static final int STORIES_ROW = 2;
+    private static final int CUMULATIVE_FLOW_ROW = 3;
     private static final int HEADER_ROW = 1;
     private static final int WIP_ROW = 0;
+    private static final int MAX_STORIES_DISPLAYED = 9;
 
     private Deque<KanbanBoardState> pendingSnapshots = new ArrayDeque<>();
     private FlowPane readyColumn;
@@ -48,18 +51,24 @@ public class KanbanBoardPane extends GridPane {
     private SettingSpinner waitingForTestWorkInProgressLimit;
     private SettingSpinner testingWorkInProgressLimit;
 
-    private KanbanBoardPane(KanbanBoard kanbanBoard) {
+    private KanbanBoardPane(KanbanBoard kanbanBoard, EventSource<FlowHistory> flowHistories) {
         setMinWidth(0);
         setHgap(10);
-        getColumnConstraints().addAll(percentageConstraints(TOTAL_COLUMNS));
+        getColumnConstraints().addAll(percentageColumnConstraints(TOTAL_COLUMNS));
+        getRowConstraints().addAll(percentageRowConstraints(10, 10, 20, 50));
         addWorkInProgressSpinners();
         addHeaders();
         addBuckets();
+        addCumulativeFlowDiagram(flowHistories);
 
         kanbanBoard.boardChanges().filter(this::notSameAsLast).subscribe(this::remember);
         runPeriodically(UPDATE_INTERVAL, this::pollSnapshot);
 
         update(kanbanBoard);
+    }
+
+    private void addCumulativeFlowDiagram(EventSource<FlowHistory> flowHistories) {
+        add(cumulativeFlowChart(flowHistories), 0, CUMULATIVE_FLOW_ROW, TOTAL_COLUMNS, 1);
     }
 
     public EventStream<Integer> readyWorkInProgressLimit() {
@@ -109,8 +118,8 @@ public class KanbanBoardPane extends GridPane {
         return pendingSnapshots.isEmpty() || !pendingSnapshots.peek().equals(kanbanBoardState);
     }
 
-    public static KanbanBoardPane kanbanBoardPane(KanbanBoard kanbanBoard) {
-        return new KanbanBoardPane(kanbanBoard);
+    public static KanbanBoardPane kanbanBoardPane(KanbanBoard kanbanBoard, EventSource<FlowHistory> flowHistories) {
+        return new KanbanBoardPane(kanbanBoard, flowHistories);
     }
 
     private void remember(KanbanBoardState current) {
@@ -140,9 +149,11 @@ public class KanbanBoardPane extends GridPane {
     private void addStories(KanbanBoardState current, Function<KanbanBoardState, List<? extends StoryInLane>> storiesOfType, FlowPane column) {
         column.getChildren().clear();
         List<? extends StoryInLane> stories = storiesOfType.apply(current);
-        for (StoryInLane storyInLane : stories) {
-            Story story = storyInLane.story();
+        stories.stream().map(StoryInLane::story).limit(MAX_STORIES_DISPLAYED).forEach(story -> {
             column.getChildren().add(story(String.format("#%d", story.storyNumber())));
+        });
+        if (stories.size() > MAX_STORIES_DISPLAYED) {
+            column.getChildren().add(new Text(String.format("and %d more...", stories.size() - MAX_STORIES_DISPLAYED)));
         }
     }
 

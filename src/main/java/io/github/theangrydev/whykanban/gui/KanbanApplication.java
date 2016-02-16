@@ -2,6 +2,7 @@ package io.github.theangrydev.whykanban.gui;
 
 import io.github.theangrydev.whykanban.board.KanbanBoard;
 import io.github.theangrydev.whykanban.simulation.Backlog;
+import io.github.theangrydev.whykanban.simulation.FlowHistory;
 import io.github.theangrydev.whykanban.simulation.Simulation;
 import io.github.theangrydev.whykanban.team.*;
 import javafx.application.Application;
@@ -17,17 +18,20 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.reactfx.EventSource;
 
+import java.util.Collections;
 import java.util.function.Supplier;
 
 import static io.github.theangrydev.whykanban.gui.Column.column;
-import static io.github.theangrydev.whykanban.gui.PercentageColumnConstraints.percentageConstraints;
+import static io.github.theangrydev.whykanban.gui.PercentageConstraints.percentageColumnConstraints;
 import static io.github.theangrydev.whykanban.gui.KanbanBoardPane.kanbanBoardPane;
 import static io.github.theangrydev.whykanban.gui.MouseEvents.leftClicks;
 import static io.github.theangrydev.whykanban.gui.StatisticTicker.statisticWithLabel;
 import static io.github.theangrydev.whykanban.gui.SettingSpinner.settingSpinner;
+import static io.github.theangrydev.whykanban.simulation.FlowHistory.flowHistory;
 import static io.github.theangrydev.whykanban.team.BusinessAnalyst.businessAnalyst;
 import static io.github.theangrydev.whykanban.team.Developer.developer;
 import static io.github.theangrydev.whykanban.team.Tester.tester;
+import static java.util.Collections.emptyList;
 
 public class KanbanApplication extends Application {
 
@@ -51,6 +55,7 @@ public class KanbanApplication extends Application {
         return team;
     }
 
+    private final EventSource<FlowHistory> flowHistories = new EventSource<>();
     private final EventSource<Double> averageLeadTimes = new EventSource<>();
     private final EventSource<Double> storiesCompletedPerDay = new EventSource<>();
     private final EventSource<Integer> totalStoriesCompleted = new EventSource<>();
@@ -62,7 +67,7 @@ public class KanbanApplication extends Application {
         root.setMinSize(0, 0);
         root.setPadding(new Insets(10));
         root.setRight(statisticsColumn());
-        KanbanBoardPane kanbanBoardPane = kanbanBoardPane(kanbanBoard);
+        KanbanBoardPane kanbanBoardPane = kanbanBoardPane(kanbanBoard, flowHistories);
         kanbanBoardPane.readyWorkInProgressLimit().subscribe(kanbanBoard::withReadyToPlayWorkInProgressLimit);
         kanbanBoardPane.analysisWorkInProgressLimit().subscribe(kanbanBoard::withAnalysisWorkInProgressLimit);
         kanbanBoardPane.developmentWorkInProgressLimit().subscribe(kanbanBoard::withDevelopmentWorkInProgressLimit);
@@ -85,7 +90,7 @@ public class KanbanApplication extends Application {
         GridPane controls = new GridPane();
         controls.setMinWidth(0);
         controls.setHgap(10);
-        controls.getColumnConstraints().addAll(percentageConstraints(5));
+        controls.getColumnConstraints().addAll(percentageColumnConstraints(5));
 
         controls.add(advanceDayButton(), 0, 0);
 
@@ -158,10 +163,12 @@ public class KanbanApplication extends Application {
         storiesPerDayTicker.clear();
         totalStoriesCompletedTicker.clear();
         totalDaysCompletedTicker.clear();
+        flowHistories.push(flowHistory(emptyList(), emptyList(), emptyList(), emptyList(), emptyList()));
     }
 
     private void advanceOneDay() {
         simulation.advanceOneDay();
+        flowHistories.push(simulation.flowHistory());
         averageLeadTimes.push(simulation.averageLeadTime());
         storiesCompletedPerDay.push(simulation.storiesCompletedPerDay());
         totalStoriesCompleted.push(simulation.totalStoriesCompleted());
