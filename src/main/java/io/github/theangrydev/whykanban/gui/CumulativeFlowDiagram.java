@@ -23,11 +23,11 @@ public class CumulativeFlowDiagram extends SwingNode {
     private static final int TESTING_INDEX = 4;
 
     private static final String[] HEADERS = {"Ready", "Analysis", "Development", "Waiting For Test", "Testing"};
-    public static final String CHART_TITLE = "Cumulative Flow";
-    public static final String STORY_COUNT_AXIS_LABEL = "Day Number";
-    public static final String STORY_AXIS_LABEL = "Stories Waiting";
-    public static final boolean ENABLE_TOOLTIPS = true;
-    public static final boolean ENABLE_URLS = false;
+    private static final String CHART_TITLE = "Cumulative Flow";
+    private static final String STORY_COUNT_AXIS_LABEL = "Day Number";
+    private static final String STORY_AXIS_LABEL = "Stories Waiting";
+    private static final boolean ENABLE_TOOLTIPS = true;
+    private static final boolean ENABLE_URLS = false;
 
     private CumulativeFlowDiagram(EventStream<FlowHistory> flowHistories) {
         flowHistories.map(this::flowHistoryData).subscribe(this::populateChart);
